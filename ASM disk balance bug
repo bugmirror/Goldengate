@@ -1,0 +1,13 @@
+Issue: Data corruption in EDB as soon as new ASM disk has been added to existing disk group to address the space issue
+
+When did  the corruption start ? :  Every time when we add a new disk to the ASM disk group , it’ll try to balance the data by shifting the data blocks from existing disks to the newly added disk. Data corruption happened as soon as new disk is added to disk group. New disk  name is ( mpathap{p1}  - DB90_DATA063 ( ASM Label )
+
+Reason for corruption: Kpartx which creates partition on mpathap ( newly added disk multipath device name ) should have created partition as mpathap{p1} but instead it created as mpatha{p1} silently. There was a disk with that name already and it overwrote that device label but didn’t warn or give any errors.
+
+Root cause: Oracle acknowledged that this is bug in kpartx utility and that has been fixed in latest version. 
+
+Oracle Linux SR: 3-18969690383
+
+There is a known issue where some tools will treat [device-name]pN as a synonym for [device-name]N out of respect for an obsolete device-naming scheme where the partition number at the end of the device name was preceded by a 'p'. 
+
+Bug id:  This package is from upstream from Redhat.  Link to bug details. https://bugzilla.redhat.com/show_bug.cgi?id=1238507  and Redhat Article is  https://access.redhat.com/solutions/1519723 
